@@ -106,7 +106,7 @@ func (p *Proxy) respondUDP(d *DNSContext) error {
 		return err
 	}
 	if err != nil {
-		return errorx.Decorate(err, "conn.WriteTo() returned error")
+		return errorx.Decorate(err, "conn.WriteMsgUDP() returned error")
 	}
 	if n != len(bytes) {
 		return fmt.Errorf("conn.WriteTo() returned with %d != %d", n, len(bytes))
@@ -130,7 +130,7 @@ func udpSetOptions(c *net.UDPConn) error {
 	err6 := ipv6.NewPacketConn(c).SetControlMessage(ipv6.FlagDst|ipv6.FlagInterface, true)
 	err4 := ipv4.NewPacketConn(c).SetControlMessage(ipv4.FlagDst|ipv4.FlagInterface, true)
 	if err6 != nil && err4 != nil {
-		return err4
+		return errorx.DecorateMany("SetControlMessage: ", err4, err6)
 	}
 	return nil
 }
